@@ -1,7 +1,34 @@
 {
-  "name": "yagd-frontend",
+  "name": "yagd-client",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
+  "main": "build/electron/main.js",
+  "build": {
+    "extends": null,
+    "files": [
+      "build/**/*"
+    ]
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "prepare": "husky install",
+    "lint-staged": "lint-staged",
+    "dev": "run-p dev:*",
+    "dev:run": "wait-on http://localhost:3000 && tsc -p electron && electron .",
+    "dev:main": "wait-on http://localhost:3000 && tsc -p electron -w",
+    "dev:renderer": "cross-env BROWSER=none yarn start",
+    "electron:build": "yarn build && tsc -p electron && electron-builder"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --max-warnings=0 --ext .ts --ext .ts"
+    ]
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.2.0",
@@ -15,14 +42,6 @@
     "react-scripts": "5.0.1",
     "typescript": "^4.6.4",
     "web-vitals": "^2.1.4"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "prepare": "husky install",
-    "lint-staged": "lint-staged"
   },
   "eslintConfig": {
     "extends": [
@@ -45,15 +64,15 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
+    "cross-env": "^7.0.3",
+    "electron": "^18.2.0",
+    "electron-builder": "^23.0.3",
+    "electron-is-dev": "^2.0.0",
     "eslint": "^8.15.0",
     "husky": "^8.0.1",
     "lint-staged": "^12.4.1",
-    "prettier": "^2.6.2"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "prettier --write",
-      "eslint --max-warnings=0 --ext .ts --ext .ts"
-    ]
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.6.2",
+    "wait-on": "^6.0.1"
   }
 }
