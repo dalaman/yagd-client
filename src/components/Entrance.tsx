@@ -11,6 +11,7 @@ import {
     Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { NewOrJoin } from "../utils/types";
 
 type SaveStep = {
     label: string;
@@ -20,8 +21,6 @@ type SaveStep = {
     buttonOnClickNext?: () => void;
     buttonOnClickBack?: () => void;
 };
-
-type NewOrJoin = "New" | "Join";
 
 function Entrance() {
     const navigate = useNavigate();

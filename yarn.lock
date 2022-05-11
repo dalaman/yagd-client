@@ -1602,6 +1602,21 @@
     lodash "^4.17.15"
     tmp-promise "^3.0.2"
 
+"@monaco-editor/loader@^1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@monaco-editor/loader/-/loader-1.3.1.tgz#35d198fb13a983dd49e9e448a172b6a9da309411"
+  integrity sha512-LfpAO6e54SZQW0nnI1sWKO4XtAlNx3WHXYZixeVy0HhZ4txGPOok4rs2u4dSi2+iRWeL198cZ2FlFQKr8mH+cw==
+  dependencies:
+    state-local "^1.0.6"
+
+"@monaco-editor/react@^4.4.4":
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/@monaco-editor/react/-/react-4.4.4.tgz#8d6b0ac144e2b673f85408e30f1facafff9b7aab"
+  integrity sha512-yQsYnVkgP5RC5ZMoRVCXSBn4D4hLUOgoQK+AZJpVY57NDXmEb57OVaaYKh8/RTzxkpuLV278hKNw5DnuzlgQwg==
+  dependencies:
+    "@monaco-editor/loader" "^1.3.1"
+    prop-types "^15.7.2"
+
 "@mui/base@5.0.0-alpha.80":
   version "5.0.0-alpha.80"
   resolved "https://registry.yarnpkg.com/@mui/base/-/base-5.0.0-alpha.80.tgz#2449508d7e6cda6a86b964b601ec5410c6dbeb9e"
@@ -7218,6 +7233,11 @@ mkdirp@^0.5.4, mkdirp@~0.5.1:
   dependencies:
     minimist "^1.2.6"
 
+monaco-editor@^0.33.0:
+  version "0.33.0"
+  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.33.0.tgz#842e244f3750a2482f8a29c676b5684e75ff34af"
+  integrity sha512-VcRWPSLIUEgQJQIE0pVT8FcGBIgFoxz7jtqctE+IiCxWugD0DwgyQBcZBhdSrdMC84eumoqMZsGl2GTreOzwqw==
+
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
@@ -8375,7 +8395,7 @@ prompts@^2.0.1, prompts@^2.4.2:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.6.2, prop-types@^15.8.1:
+prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -9401,6 +9421,11 @@ stat-mode@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/stat-mode/-/stat-mode-1.0.0.tgz#68b55cb61ea639ff57136f36b216a291800d1465"
   integrity sha512-jH9EhtKIjuXZ2cWxmXS8ZP80XyC3iasQxMDV8jzhNJpfDb7VbQLVW4Wvsxz9QZvzV+G4YoSfBUVKDOyxLzi/sg==
+
+state-local@^1.0.6:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/state-local/-/state-local-1.0.7.tgz#da50211d07f05748d53009bee46307a37db386d5"
+  integrity sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==
 
 statuses@2.0.1:
   version "2.0.1"
