@@ -1,10 +1,7 @@
 import { Protocol, ProtocolHeaderType } from "./types";
+import { WHOAMI, URL } from "./config";
 
-const PORT = "8080"; // FIXME: port num
-const rand = Math.floor(Math.random() * 10000 + 1);
-const WHOAMI = "Alice" + rand; // FIXME: name
-
-const webSocket = new WebSocket(`ws://127.0.0.1:${PORT}`);
+const webSocket = new WebSocket(URL);
 
 webSocket.onopen = () => {
     const myname = "Alice"; // FIXME: name

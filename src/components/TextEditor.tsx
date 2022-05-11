@@ -31,17 +31,12 @@ import {
     openFilePicker,
     openFolderDirectory,
 } from "../utils/utils";
+import {
+    editorTheme,
+    defaultText,
+    availableLanguageList,
+} from "../utils/config";
 // import ICursorPositionChangedEvent from "monaco-editor";
-
-// params
-const editorTheme = "vs-dark";
-// const language = "javascript";
-const defaultValue = `// type somthing below\n
-const func = () => {
-    console.log("Hey, howdy!");
-}`;
-const languageList = ["txt", "javascript", "typescript"];
-// end params
 
 type Props = {
     send?: (a: ProtocolHeaderType, b: string) => void;
@@ -235,11 +230,13 @@ function TextEditor(props: Props) {
                             label="Age"
                             onChange={handleChangeLanguage}
                         >
-                            {languageList.map((lang: string, idx: number) => (
-                                <MenuItem key={idx} value={lang}>
-                                    {lang}
-                                </MenuItem>
-                            ))}
+                            {availableLanguageList.map(
+                                (lang: string, idx: number) => (
+                                    <MenuItem key={idx} value={lang}>
+                                        {lang}
+                                    </MenuItem>
+                                )
+                            )}
                         </Select>
                     </FormControl>
                 </Stack>
@@ -273,7 +270,7 @@ function TextEditor(props: Props) {
                 theme={editorTheme}
                 language={language}
                 loading={<CircularProgress />}
-                defaultValue={defaultValue}
+                defaultValue={defaultText}
                 onChange={handleEditorChange}
                 onMount={handleEditorMount}
             />

@@ -15,8 +15,8 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Link } from "react-router-dom";
+import { WHOAMI } from "../utils/config";
 
-const username = "AA";
 const email = "foo@example.com";
 
 const theme = createTheme({
@@ -95,10 +95,10 @@ function MenuDrawer(props: Props) {
             <CardHeader
                 avatar={
                     <ThemeProvider theme={theme}>
-                        <Avatar {...stringAvatar(username)} />
+                        <Avatar {...stringAvatar(WHOAMI)} />
                     </ThemeProvider>
                 }
-                title={username}
+                title={WHOAMI}
                 subheader={email}
             />
         </Card>
