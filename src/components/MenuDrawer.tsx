@@ -1,32 +1,22 @@
 import React from "react";
 import {
     Box,
-    SwipeableDrawer,
+    Card,
+    CardHeader,
     List,
     ListItem,
     ListItemIcon,
     ListItemText,
-    Card,
-    CardHeader,
-    Avatar,
+    SwipeableDrawer,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import DescriptionIcon from "@mui/icons-material/Description";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Link } from "react-router-dom";
 import { WHOAMI } from "../utils/config";
+import Avatar from "./Avatar";
 
 const email = "foo@example.com";
-
-const theme = createTheme({
-    typography: {
-        button: {
-            textTransform: "none",
-        },
-    },
-    palette: {},
-});
 
 type Props = {
     openMenuDrawer: boolean;
@@ -59,45 +49,11 @@ const iconNameList: Array<IconName> = [
     },
 ];
 
-function stringToColor(string: string) {
-    let hash = 0;
-    let i;
-
-    /* eslint-disable no-bitwise */
-    for (i = 0; i < string.length; i += 1) {
-        hash = string.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    let color = "#";
-
-    for (i = 0; i < 3; i += 1) {
-        const value = (hash >> (i * 8)) & 0xff;
-        color += `00${value.toString(16)}`.slice(-2);
-    }
-    /* eslint-enable no-bitwise */
-
-    return color;
-}
-
-function stringAvatar(name: string) {
-    return {
-        sx: {
-            bgcolor: stringToColor(name),
-            backgroundcolor: "primary.sub",
-        },
-        children: name[0],
-    };
-}
-
 function MenuDrawer(props: Props) {
     const myStatus = (
         <Card sx={{ maxWidth: 345 }}>
             <CardHeader
-                avatar={
-                    <ThemeProvider theme={theme}>
-                        <Avatar {...stringAvatar(WHOAMI)} />
-                    </ThemeProvider>
-                }
+                avatar={<Avatar name={WHOAMI} />}
                 title={WHOAMI}
                 subheader={email}
             />
