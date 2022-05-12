@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import SaveIcon from "@mui/icons-material/Save";
+import ChatIcon from "@mui/icons-material/Chat";
 import FileOpenIcon from "@mui/icons-material/FileOpen";
 import * as monaco from "monaco-editor";
 import useWindowSize from "../utils/useWindowSize";
@@ -40,6 +41,7 @@ import {
 
 type Props = {
     send?: (a: ProtocolHeaderType, b: string) => void;
+    toggleChat?: () => (event: React.KeyboardEvent | React.MouseEvent) => void;
 };
 
 function TextEditor(props: Props) {
@@ -240,6 +242,20 @@ function TextEditor(props: Props) {
                         </Select>
                     </FormControl>
                 </Stack>
+
+                {props.toggleChat ? (
+                    <IconButton
+                        size="large"
+                        edge="start"
+                        color="inherit"
+                        aria-label="chat"
+                        onClick={props.toggleChat()}
+                    >
+                        <ChatIcon />
+                    </IconButton>
+                ) : (
+                    <div />
+                )}
             </Stack>
         </CardContent>
     );

@@ -11,3 +11,9 @@ export type Protocol = {
     header: ProtocolHeader;
     content: string;
 };
+
+export type ChatElement = {
+    time: string;
+    from: string;
+    message: string;
+};

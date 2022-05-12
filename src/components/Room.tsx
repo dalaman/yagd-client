@@ -9,6 +9,7 @@ import {
 import TextEditor from "./TextEditor";
 import { sendWrapper } from "../utils/websocket";
 import Avatar from "./Avatar";
+import Chat from "./Chat";
 
 const title = "Room";
 
@@ -28,6 +29,22 @@ function Room() {
     const handleClickExit = () => {
         console.log("handleClickExit");
     };
+
+    const [openChat, setOpenChat] = React.useState(false);
+
+    const toggleChat =
+        () => (event: React.KeyboardEvent | React.MouseEvent) => {
+            if (
+                event &&
+                event.type === "keydown" &&
+                ((event as React.KeyboardEvent).key === "Tab" ||
+                    (event as React.KeyboardEvent).key === "Shift")
+            ) {
+                return;
+            }
+
+            setOpenChat(!openChat);
+        };
 
     return (
         <div>
@@ -54,7 +71,9 @@ function Room() {
                 </Stack>
             </CardContent>
 
-            <TextEditor send={sendWrapper} />
+            <TextEditor send={sendWrapper} toggleChat={toggleChat} />
+
+            <Chat openChat={openChat} toggleChat={toggleChat} />
         </div>
     );
 }
