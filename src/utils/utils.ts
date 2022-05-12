@@ -31,3 +31,15 @@ export const writeFile = async (
 export const readFile = async (filepath: string) => {
     return await _window.electron.readFile(filepath, "utf8");
 };
+
+export const sliceSplit = (str: string, length: number) => {
+    const splitted: Array<string> = [];
+
+    while (str.length > length) {
+        splitted.push(str.slice(0, length));
+        str = str.slice(length);
+    }
+
+    splitted.push(str);
+    return splitted;
+};

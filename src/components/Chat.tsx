@@ -13,19 +13,9 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { ChatElement } from "../utils/types";
-
-const chatElementList = [
-    {
-        time: "10:00",
-        from: "Alice",
-        message: "Hello, World",
-    },
-    {
-        time: "10:01",
-        from: "Bob",
-        message: "lalala",
-    },
-];
+import { sliceSplit } from "../utils/utils";
+// import { sendWrapper } from "../utils/websocket";
+import { webSocket, sendWrapper } from "../utils/websocket";
 
 type Props = {
     openChat: boolean;
@@ -33,7 +23,41 @@ type Props = {
 };
 
 function Chat(props: Props) {
+    const maxCharPerLine = 20;
+
     const [message, setMessage] = React.useState("");
+
+    const [chatElementList, setChatElementList] = React.useState<
+        Array<ChatElement>
+    >([]);
+
+    // HACK: duplicate onmessage
+    webSocket.onmessage = (event) => {
+        const parsed = JSON.parse(event.data);
+        if (parsed.header.type === "CHAT") {
+            receiveChat(parsed.header.name, parsed.content);
+            console.log("RECEIVE", parsed);
+        }
+    };
+
+    const receiveChat = (name: string, message: string) => {
+        const date = new Date();
+        const now = date.toLocaleTimeString("ja-JA", {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+
+        const newElement: ChatElement = {
+            time: now,
+            from: name,
+            message: message,
+        };
+
+        const chatElementListTmp = chatElementList;
+        chatElementListTmp.push(newElement);
+        setChatElementList(chatElementListTmp);
+        update();
+    };
 
     const handleChangeMessage = (
         event: React.ChangeEvent<HTMLInputElement>
@@ -43,14 +67,26 @@ function Chat(props: Props) {
 
     const handleClickSend = () => {
         if (message !== "") {
-            console.log(message);
+            sendWrapper(/* type= */ "CHAT", /* content= */ message);
             setMessage(""); // clear
         }
     };
 
+    // XXX:
+    const [foo, setFoo] = React.useState(0);
+    const update = () => {
+        setFoo(foo + 1);
+    };
+    React.useEffect(() => {
+        if (foo % 2 === 1) {
+            update();
+        }
+    }, [foo]);
+    // end XXX
+
     const header = (
-        <Card sx={{ width: 300 }}>
-            <CardHeader title="Chat" />
+        <Card sx={{ maxWidth: 300 }}>
+            <CardHeader title="Chat" sx={{ width: 300 }} />
         </Card>
     );
 
@@ -65,22 +101,24 @@ function Chat(props: Props) {
                                 spacing={1}
                                 alignItems="baseline"
                             >
-                                <ListItemText
-                                    primary={chatElement.from}
-                                ></ListItemText>
-
-                                <ListItemText
-                                    secondary={chatElement.time}
-                                ></ListItemText>
+                                <ListItemText primary={chatElement.from} />
+                                <ListItemText secondary={chatElement.time} />
                             </Stack>
 
-                            <ListItemText
-                                primary={"> " + chatElement.message}
-                            ></ListItemText>
+                            {sliceSplit(
+                                /* str= */ chatElement.message,
+                                /* length= */ maxCharPerLine
+                            ).map((str: string, idx: number) => (
+                                <ListItemText
+                                    key={idx}
+                                    sx={{ my: -0.3 }}
+                                    primary={"> " + str}
+                                />
+                            ))}
                         </Stack>
                     </ListItem>
 
-                    <Divider />
+                    <Divider sx={{ mt: 1 }} />
                 </div>
             ))}
         </List>
@@ -93,9 +131,13 @@ function Chat(props: Props) {
                 label="Message"
                 size="small"
                 sx={{ ml: 1 }}
-                multiline={true}
                 value={message}
                 onChange={handleChangeMessage}
+                onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                        handleClickSend();
+                    }
+                }}
             />
 
             <Fab

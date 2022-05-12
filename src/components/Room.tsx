@@ -7,17 +7,17 @@ import {
     Typography,
 } from "@mui/material";
 import TextEditor from "./TextEditor";
-import { sendWrapper } from "../utils/websocket";
 import Avatar from "./Avatar";
 import Chat from "./Chat";
 
 const title = "Room";
 
 const memberList = ["Alice", "Bob", "Chris", "David", "Elizabeth"];
-const maxAvatarDisplay = 4;
-const memberAvatarSize = 35;
 
 function Room() {
+    const maxAvatarDisplay = 4;
+    const memberAvatarSize = 35;
+
     const avatarGroup = (
         <AvatarGroup max={maxAvatarDisplay}>
             {memberList.map((member: string, idx: number) => (
@@ -71,7 +71,7 @@ function Room() {
                 </Stack>
             </CardContent>
 
-            <TextEditor send={sendWrapper} toggleChat={toggleChat} />
+            <TextEditor toggleChat={toggleChat} />
 
             <Chat openChat={openChat} toggleChat={toggleChat} />
         </div>
