@@ -1,5 +1,6 @@
 import React from "react";
 import {
+    Alert,
     Card,
     CardHeader,
     Divider,
@@ -8,6 +9,7 @@ import {
     ListItem,
     ListItemText,
     TextField,
+    Snackbar,
     Stack,
     SwipeableDrawer,
 } from "@mui/material";
@@ -16,6 +18,7 @@ import { ChatElement } from "../utils/types";
 import { sliceSplit } from "../utils/utils";
 // import { sendWrapper } from "../utils/websocket";
 import { webSocket, sendWrapper } from "../utils/websocket";
+import { joiningMessageSuffix } from "../utils/config";
 
 type Props = {
     openChat: boolean;
@@ -56,7 +59,15 @@ function Chat(props: Props) {
         const chatElementListTmp = chatElementList;
         chatElementListTmp.push(newElement);
         setChatElementList(chatElementListTmp);
-        update();
+
+        // if new member join
+        if (
+            message.slice(message.length - joiningMessageSuffix.length) ===
+            joiningMessageSuffix
+        ) {
+            setAlertMessage(message);
+            setOpenSnackbar(true);
+        }
     };
 
     const handleChangeMessage = (
@@ -72,23 +83,25 @@ function Chat(props: Props) {
         }
     };
 
-    // XXX:
-    const [foo, setFoo] = React.useState(0);
-    const update = () => {
-        setFoo(foo + 1);
-    };
-    React.useEffect(() => {
-        if (foo % 2 === 1) {
-            update();
-        }
-    }, [foo]);
-    // end XXX
-
     const header = (
         <Card sx={{ maxWidth: 300 }}>
             <CardHeader title="Chat" sx={{ width: 300 }} />
         </Card>
     );
+
+    // alert
+    const [openSnackbar, setOpenSnackbar] = React.useState(false);
+    const [alertMessage, setAlertMessage] = React.useState("");
+    const handleCloseSnackbar = (
+        event?: React.SyntheticEvent | Event,
+        reason?: string
+    ) => {
+        if (reason === "clickaway") {
+            return;
+        }
+        setOpenSnackbar(false);
+    };
+    // end alert
 
     const content = (
         <List>
@@ -153,6 +166,21 @@ function Chat(props: Props) {
 
     return (
         <div>
+            <Snackbar
+                open={openSnackbar}
+                onClose={handleCloseSnackbar}
+                sx={{ minWidth: 300 }}
+                anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                }}
+                autoHideDuration={3000}
+            >
+                <Alert onClose={handleCloseSnackbar} severity="info">
+                    {alertMessage}
+                </Alert>
+            </Snackbar>
+
             <React.Fragment key="left">
                 <SwipeableDrawer
                     anchor="right"

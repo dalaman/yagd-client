@@ -9,3 +9,5 @@ const rand = Math.floor(Math.random() * 10000 + 1);
 
 export const WHOAMI = "Alice" + rand; // FIXME: name
 export const URL = `ws://127.0.0.1:${PORT}`;
+
+export const joiningMessageSuffix = " joined";
