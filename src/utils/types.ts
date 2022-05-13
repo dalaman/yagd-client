@@ -17,3 +17,12 @@ export type ChatElement = {
     from: string;
     message: string;
 };
+
+export type CursorPosition = {
+    lineNumber: number;
+    column: number;
+};
+
+export type CursorUserDict = {
+    [name: string]: CursorPosition;
+};

@@ -1,9 +1,6 @@
 export const editorTheme = "vs-dark";
 
-export const defaultText = `// type somthing below\n
-const func = () => {
-    console.log("Hey, howdy!");
-}`;
+export const defaultText = `// type somthing below\n\n`;
 
 export const availableLanguageList = ["txt", "javascript", "typescript"];
 
