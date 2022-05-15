@@ -41,6 +41,7 @@ function Chat(props: Props) {
             receiveChat(parsed.header.name, parsed.content);
             console.log("RECEIVE", parsed);
         }
+        update();
     };
 
     const receiveChat = (name: string, message: string) => {
@@ -102,6 +103,18 @@ function Chat(props: Props) {
         setOpenSnackbar(false);
     };
     // end alert
+
+    // XXX:
+    const [foo, setFoo] = React.useState(0);
+    const update = () => {
+        setFoo(foo + 1);
+    };
+    React.useEffect(() => {
+        if (foo % 2 === 1) {
+            update();
+        }
+    }, [foo]);
+    // end; XXX
 
     const content = (
         <List>
