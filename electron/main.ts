@@ -1,9 +1,35 @@
 import * as path from "path";
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
-import { stat, readFile, writeFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 import * as isDev from "electron-is-dev";
+import * as WebSocket from "ws";
+import { spawn } from "child_process";
+
+const PORT = 8080;
+const extension = process.platform === "win32" ? "bat" : "sh";
+
+// websocket server ( <===> [ReactComp & BackendProcess.java] as client)
+const server = WebSocket.Server;
+const s = new server({
+    port: PORT,
+});
+
+s.on("connection", (ws: WebSocket) => {
+    ws.on("message", (message: string) => {
+        console.log("\nReceived\n" + message);
+
+        // send another client
+        // e.g. if message from BackendProcess.java, then send to ReactComp
+        // vice versa
+        s.clients.forEach((client: WebSocket) => {
+            if (client !== ws) client.send(String(message));
+        });
+    });
+});
+// end websocket server
 
 let mainWindow: BrowserWindow | null = null;
+let childProcess;
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -41,7 +67,7 @@ function registerIpcHandlers(mainWindow: BrowserWindow) {
         });
     });
 
-    ipcMain.handle("select-file", function () {
+    ipcMain.handle("select-file", () => {
         return dialog.showOpenDialog(mainWindow, {
             properties: ["openFile"],
             filters: [{ name: "*", extensions: ["*"] }],
@@ -61,4 +87,30 @@ function registerIpcHandlers(mainWindow: BrowserWindow) {
             return await writeFile(filePath, content);
         }
     );
+
+    ipcMain.handle("spawn-child-process", () => {
+        return spawnChildProcess();
+    });
 }
+
+const spawnChildProcess = () => {
+    console.log("spawnChildProcess called in main.ts");
+
+    const filepath = path.join("scripts", "run_child_process." + extension);
+
+    childProcess = spawn(
+        extension == "sh" ? ". " + filepath : filepath, // .sh needs "." for exec
+        [`${PORT}`],
+        { shell: true }
+    );
+
+    childProcess.stdout.on("data", (data) => {
+        console.log(String(data));
+    });
+
+    childProcess.stderr.on("data", (data) => {
+        console.error(String(data));
+    });
+
+    return true;
+};

@@ -9,6 +9,7 @@ import {
 import TextEditor from "./TextEditor";
 import Avatar from "./Avatar";
 import Chat from "./Chat";
+import { spawnChildProcess } from "../utils/utils";
 
 const title = "Room";
 
@@ -45,6 +46,10 @@ function Room() {
 
             setOpenChat(!openChat);
         };
+
+    React.useEffect(() => {
+        spawnChildProcess();
+    }, []);
 
     return (
         <div>

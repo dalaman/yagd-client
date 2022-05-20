@@ -13,6 +13,7 @@ export default interface API {
     selectDirectory: () => Promise<Dialog>;
     selectFile: () => Promise<Dialog>;
     pathJoin: (dir: string, filename: string) => string;
+    spawnChildProcess: () => Promise<boolean>;
 }
 
 async function readFile(filePath: string): Promise<Buffer>;
@@ -57,12 +58,19 @@ const pathJoin = (dir: string, filename: string) => {
     return path.join(dir, filename);
 };
 
+const spawnChildProcess = async () => {
+    return (await ipcRenderer.invoke(
+        "spawn-child-process"
+    )) as Promise<boolean>;
+};
+
 const api: API = {
     readFile,
     writeFile,
     selectDirectory,
     selectFile,
     pathJoin,
+    spawnChildProcess,
 };
 
 contextBridge.exposeInMainWorld("electron", api);

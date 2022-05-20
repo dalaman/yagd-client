@@ -43,3 +43,8 @@ export const sliceSplit = (str: string, length: number) => {
     splitted.push(str);
     return splitted;
 };
+
+export const spawnChildProcess = async () => {
+    console.log("spawnChildProcess called in uitls.tssss");
+    return await _window.electron.spawnChildProcess();
+};
