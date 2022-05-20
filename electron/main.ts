@@ -3,10 +3,10 @@ import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import { readFile, writeFile } from "fs/promises";
 import * as isDev from "electron-is-dev";
 import * as WebSocket from "ws";
-import { spawn } from "child_process";
+import { spawn, ChildProcessWithoutNullStreams } from "child_process";
 
 const PORT = 8080;
-const extension = process.platform === "win32" ? "bat" : "sh";
+const platform = process.platform === "win32" ? "win" : "lin";
 
 // websocket server ( <===> [ReactComp & BackendProcess.java] as client)
 const server = WebSocket.Server;
@@ -29,7 +29,7 @@ s.on("connection", (ws: WebSocket) => {
 // end websocket server
 
 let mainWindow: BrowserWindow | null = null;
-let childProcess;
+let childProcess: ChildProcessWithoutNullStreams;
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -57,7 +57,10 @@ app.whenReady().then(async () => {
     createWindow();
 });
 
-app.once("window-all-closed", () => app.quit());
+app.once("window-all-closed", () => {
+    app.quit();
+    childProcess.kill("SIGHUP");
+});
 
 // register tasks to be executed by the background process
 function registerIpcHandlers(mainWindow: BrowserWindow) {
@@ -96,13 +99,17 @@ function registerIpcHandlers(mainWindow: BrowserWindow) {
 const spawnChildProcess = () => {
     console.log("spawnChildProcess called in main.ts");
 
-    const filepath = path.join("scripts", "run_child_process." + extension);
+    const filepath = path.join("scripts", "run_child_process");
 
-    childProcess = spawn(
-        extension == "sh" ? ". " + filepath : filepath, // .sh needs "." for exec
-        [`${PORT}`],
-        { shell: true }
-    );
+    if (platform === "win") {
+        childProcess = spawn(filepath + ".bat", [String(PORT)], {
+            shell: true,
+        });
+    } else if (platform === "lin") {
+        childProcess = spawn("bash", [filepath + ".sh", String(PORT)], {
+            shell: true,
+        });
+    }
 
     childProcess.stdout.on("data", (data) => {
         console.log(String(data));

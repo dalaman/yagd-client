@@ -37,7 +37,10 @@ function Chat(props: Props) {
     // HACK: duplicate onmessage
     webSocket.onmessage = (event) => {
         const parsed = JSON.parse(event.data);
-        if (parsed.header.type === "CHAT") {
+
+        if (Object.keys(parsed)[0] === "INFO") {
+            /**/
+        } else if (parsed.header.type === "CHAT") {
             receiveChat(parsed.header.name, parsed.content);
             console.log("RECEIVE", parsed);
         }

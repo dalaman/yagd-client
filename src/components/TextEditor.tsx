@@ -40,6 +40,7 @@ import { webSocket, sendWrapper } from "../utils/websocket";
 import "./TextEditor.css";
 import { WHOAMI } from "../utils/config";
 import { CursorPosition, CursorUserDict } from "../utils/types";
+import CircularProgressWithText from "./CircularProgressWithText";
 // import ICursorPositionChangedEvent from "monaco-editor";
 
 type Props = {
@@ -49,6 +50,8 @@ type Props = {
 function TextEditor(props: Props) {
     const bottomMargin = 250;
     const [innerWidth, innerHeight] = useWindowSize();
+    const [openCircularProgress, setOpenCircularProgress] =
+        React.useState(true);
 
     // filename
     const [filename, setFilename] = React.useState("");
@@ -157,7 +160,11 @@ function TextEditor(props: Props) {
     // HACK: duplicate onmessage
     webSocket.onmessage = (event) => {
         const parsed = JSON.parse(event.data);
-        if (parsed.header.type === "CURSOR") {
+
+        if (Object.keys(parsed)[0] === "INFO") {
+            console.log("INFO", parsed);
+            setOpenCircularProgress(false);
+        } else if (parsed.header.type === "CURSOR") {
             updateCursor(parsed.header.name, parsed.content);
             console.log("RECEIVE", parsed);
         } else if (parsed.header.type === "TEXT") {
@@ -336,6 +343,11 @@ function TextEditor(props: Props) {
                     {alertMessage}
                 </Alert>
             </Snackbar>
+
+            <CircularProgressWithText
+                open={openCircularProgress}
+                whatURwating4="Connecting..."
+            />
 
             {dialog}
 
