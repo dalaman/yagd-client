@@ -48,14 +48,18 @@ function Entrance() {
         handleNext();
     };
 
-    const handleChangeRoodId = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChangeRoomId = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRoomId(event.target.value);
     };
 
-    const handleChangeRoodPassword = (
+    const handleChangeRoomPassword = (
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
         setRoomPassword(event.target.value);
+    };
+
+    const enterRoom = () => {
+        navigate("/room");
     };
 
     const saveStepList: Array<SaveStep> = [
@@ -92,7 +96,17 @@ function Entrance() {
                     ? "Set new Room ID e.g. xxx"
                     : "Enter Room ID",
             disableNext: roomId === "",
-            comps: <TextField label="Room ID" onChange={handleChangeRoodId} />,
+            comps: (
+                <TextField
+                    label="Room ID"
+                    onChange={handleChangeRoomId}
+                    onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                            handleNext();
+                        }
+                    }}
+                />
+            ),
             buttonOnClickNext: handleNext,
             buttonOnClickBack: handleBack,
         },
@@ -104,10 +118,15 @@ function Entrance() {
             comps: (
                 <TextField
                     label="Room Password"
-                    onChange={handleChangeRoodPassword}
+                    onChange={handleChangeRoomPassword}
+                    onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                            enterRoom();
+                        }
+                    }}
                 />
             ),
-            buttonOnClickNext: () => navigate("/room"),
+            buttonOnClickNext: enterRoom,
             buttonOnClickBack: handleBack,
         },
     ];
