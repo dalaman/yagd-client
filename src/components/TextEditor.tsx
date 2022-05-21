@@ -50,8 +50,11 @@ type Props = {
 function TextEditor(props: Props) {
     const bottomMargin = 250;
     const [innerWidth, innerHeight] = useWindowSize();
-    const [openCircularProgress, setOpenCircularProgress] =
-        React.useState(true);
+
+    // if chat exist, need to wait connection
+    const [openCircularProgress, setOpenCircularProgress] = React.useState(
+        Boolean(props.toggleChat)
+    );
 
     // filename
     const [filename, setFilename] = React.useState("");
