@@ -14,7 +14,16 @@
     },
     "win": {
       "icon": "assets/icon.ico"
-    }
+    },
+    "extraResources": [
+      {
+        "from": "./bin",
+        "to": "./bin",
+        "filter": [
+          "**/*.class"
+        ]
+      }
+    ]
   },
   "scripts": {
     "start": "react-scripts start",
@@ -23,12 +32,14 @@
     "eject": "react-scripts eject",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
-    "dev": "run-p dev:*",
+    "prepare": "mkdir -p bin && cp ../*.class bin/",
+    "dev": "yarn prepare && run-p dev:*",
     "dev:run": "wait-on http://localhost:3000 && tsc -p electron && electron .",
     "dev:main": "wait-on http://localhost:3000 && tsc -p electron -w",
     "dev:renderer": "cross-env BROWSER=none yarn start",
-    "electron:build:win": "yarn build && tsc -p electron && electron-builder --win --x64",
-    "electron:build:lin": "yarn build && tsc -p electron && electron-builder --linux --x64"
+    "electron:build": "yarn prepare && yarn build && tsc -p electron ",
+    "electron:build:win": "yarn electron:build && electron-builder --win --x64",
+    "electron:build:lin": "yarn electron:build && electron-builder --linux --x64"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

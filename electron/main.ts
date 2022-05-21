@@ -4,10 +4,11 @@ import { readFile, writeFile } from "fs/promises";
 import * as isDev from "electron-is-dev";
 import * as WebSocket from "ws";
 import { spawn, execSync, ChildProcessWithoutNullStreams } from "child_process";
+import osCommands from "./os_commands";
 
 const PORT = 8080;
+const JAVA_CLIENT_NAME = "BackendProcess";
 const platform = process.platform === "win32" ? "win" : "lin";
-const extension = platform === "win" ? ".bat" : ".sh";
 
 // websocket server ( <===> [ReactComp & BackendProcess.java] as client)
 const server = WebSocket.Server;
@@ -109,17 +110,21 @@ const spawnChildProcess = () => {
 
     const allJavaPids = getJavaPid(); // get non-yagd java process  e.g. eclipse...
 
-    const filepath = path.join("scripts", "run_child_process") + extension;
+    let options: Array<string> = [];
 
-    if (platform === "win") {
-        childProcess = spawn(filepath, [String(PORT)], {
-            shell: true,
-        });
-    } else if (platform === "lin") {
-        childProcess = spawn("bash", [filepath, String(PORT)], {
-            shell: true,
-        });
+    if (isDev) {
+        options = ["-classpath", "./bin", JAVA_CLIENT_NAME];
+    } else {
+        options = ["-classpath", "./resources/bin", JAVA_CLIENT_NAME];
     }
+
+    childProcess = spawn(
+        /* command= */ osCommands.run_child_process[platform],
+        /* args= */ [...options, String(PORT)],
+        /* opt= */ {
+            shell: true,
+        }
+    );
 
     childProcess?.stdout.on("data", (data) => {
         console.log(String(data));
@@ -135,39 +140,22 @@ const spawnChildProcess = () => {
     });
 };
 
-const execSyncWrapper = (filename: string, args?: string[]) => {
-    const filepath = path.join("scripts", filename) + extension;
-    let cmd = "";
-    const options = args ? " " + args.join(" ") : "";
-
-    if (platform === "win") {
-        cmd = filepath + options;
-    } else if (platform === "lin") {
-        cmd = "bash " + filepath + options;
-    }
-    console.log("cmd:", cmd);
-
-    try {
-        return execSync(cmd);
-    } catch (e) {
-        return false;
-    }
-};
-
 const getJavaPid = () => {
-    const rtn = execSyncWrapper("get_java_pid");
-    console.log("rtn:", String(rtn));
-
-    if (rtn) {
-        const allJavaPids = String(rtn).split("\n");
-        allJavaPids.pop(); // pop last ""
-
-        return allJavaPids;
-
+    let rtn;
+    try {
+        rtn = execSync(osCommands.get_java_pid[platform]);
+    } catch {
         // if no java process, shell returns 1
-    } else {
+        console.log("no java ps found");
         return [];
     }
+
+    console.log("rtn:", String(rtn));
+
+    const allJavaPids = String(rtn).split("\n");
+    allJavaPids.pop(); // pop last ""
+
+    return allJavaPids;
 };
 
 const killChildProcess = () => {
@@ -177,10 +165,13 @@ const killChildProcess = () => {
     childProcess = null;
 
     if (javaClientPid) {
-        const rtn = execSyncWrapper("kill", [javaClientPid]);
-        if (rtn) {
+        const cmd = osCommands.kill[platform] + " " + javaClientPid;
+
+        try {
+            execSync(cmd);
             console.log("javaClient ps killed successfully");
-        } else {
+        } catch {
+            // if no java process, shell returns 1
             console.log("javaClient ps cannot be killed");
         }
     }

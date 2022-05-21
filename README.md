@@ -17,3 +17,5 @@
 -   Linux
 
     `yarn electron:build:lin`
+
+Get installer at *dist* dir

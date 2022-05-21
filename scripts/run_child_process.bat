@@ -1,1 +1,0 @@
-"C:\Program Files\Git\bin\bash.exe" scripts\run_child_process.sh %1

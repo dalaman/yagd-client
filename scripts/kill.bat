@@ -1,1 +1,0 @@
-taskkill.exe /PID %1 /F /T
