@@ -3,10 +3,11 @@ import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import { readFile, writeFile } from "fs/promises";
 import * as isDev from "electron-is-dev";
 import * as WebSocket from "ws";
-import { spawn, ChildProcessWithoutNullStreams } from "child_process";
+import { spawn, execSync, ChildProcessWithoutNullStreams } from "child_process";
 
 const PORT = 8080;
 const platform = process.platform === "win32" ? "win" : "lin";
+const extension = platform === "win" ? ".bat" : ".sh";
 
 // websocket server ( <===> [ReactComp & BackendProcess.java] as client)
 const server = WebSocket.Server;
@@ -30,6 +31,7 @@ s.on("connection", (ws: WebSocket) => {
 
 let mainWindow: BrowserWindow | null = null;
 let childProcess: ChildProcessWithoutNullStreams | null = null;
+let javaClientPid: string | null = null; // child process of node childPrcess
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -105,20 +107,27 @@ const spawnChildProcess = () => {
 
     console.log("spawnChildProcess called in main.ts");
 
-    const filepath = path.join("scripts", "run_child_process");
+    const allJavaPids = getJavaPid(); // get non-yagd java process  e.g. eclipse...
+
+    const filepath = path.join("scripts", "run_child_process") + extension;
 
     if (platform === "win") {
-        childProcess = spawn(filepath + ".bat", [String(PORT)], {
+        childProcess = spawn(filepath, [String(PORT)], {
             shell: true,
         });
     } else if (platform === "lin") {
-        childProcess = spawn("bash", [filepath + ".sh", String(PORT)], {
+        childProcess = spawn("bash", [filepath, String(PORT)], {
             shell: true,
         });
     }
 
     childProcess?.stdout.on("data", (data) => {
         console.log(String(data));
+        const allJavaPidsWithYagd = getJavaPid(); // get (non-yagd + yagd) java proess
+
+        javaClientPid = allJavaPidsWithYagd.filter(
+            (x) => !allJavaPids.includes(x)
+        )[0];
     });
 
     childProcess?.stderr.on("data", (data) => {
@@ -126,8 +135,54 @@ const spawnChildProcess = () => {
     });
 };
 
+const execSyncWrapper = (filename: string, args?: string[]) => {
+    const filepath = path.join("scripts", filename) + extension;
+    let cmd = "";
+    const options = args ? " " + args.join(" ") : "";
+
+    if (platform === "win") {
+        cmd = filepath + options;
+    } else if (platform === "lin") {
+        cmd = "bash " + filepath + options;
+    }
+    console.log("cmd:", cmd);
+
+    try {
+        return execSync(cmd);
+    } catch (e) {
+        return false;
+    }
+};
+
+const getJavaPid = () => {
+    const rtn = execSyncWrapper("get_java_pid");
+    console.log("rtn:", String(rtn));
+
+    if (rtn) {
+        const allJavaPids = String(rtn).split("\n");
+        allJavaPids.pop(); // pop last ""
+
+        return allJavaPids;
+
+        // if no java process, shell returns 1
+    } else {
+        return [];
+    }
+};
+
 const killChildProcess = () => {
     console.log("killChildProcess called in main.ts");
-    // childProcess.kill("SIGHUP");
+
+    childProcess?.kill("SIGHUP");
     childProcess = null;
+
+    if (javaClientPid) {
+        const rtn = execSyncWrapper("kill", [javaClientPid]);
+        if (rtn) {
+            console.log("javaClient ps killed successfully");
+        } else {
+            console.log("javaClient ps cannot be killed");
+        }
+    }
+    javaClientPid = null;
 };
