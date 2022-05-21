@@ -9,7 +9,8 @@ import {
 import TextEditor from "./TextEditor";
 import Avatar from "./Avatar";
 import Chat from "./Chat";
-import { spawnChildProcess } from "../utils/utils";
+import { spawnChildProcess, killChildProcess } from "../utils/utils";
+import { useNavigate } from "react-router-dom";
 
 const title = "Room";
 
@@ -18,6 +19,7 @@ const memberList = ["Alice", "Bob", "Chris", "David", "Elizabeth"];
 function Room() {
     const maxAvatarDisplay = 4;
     const memberAvatarSize = 35;
+    const navigate = useNavigate();
 
     const avatarGroup = (
         <AvatarGroup max={maxAvatarDisplay}>
@@ -27,8 +29,11 @@ function Room() {
         </AvatarGroup>
     );
 
+    // TODO: notify exit
     const handleClickExit = () => {
         console.log("handleClickExit");
+        killChildProcess();
+        navigate("/");
     };
 
     const [openChat, setOpenChat] = React.useState(false);

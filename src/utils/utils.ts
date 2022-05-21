@@ -45,6 +45,11 @@ export const sliceSplit = (str: string, length: number) => {
 };
 
 export const spawnChildProcess = async () => {
-    console.log("spawnChildProcess called in uitls.tssss");
+    console.log("spawnChildProcess called in uitls.ts");
     return await _window.electron.spawnChildProcess();
+};
+
+export const killChildProcess = async () => {
+    console.log("killChildProcess called in uitls.ts");
+    return await _window.electron.killChildProcess();
 };

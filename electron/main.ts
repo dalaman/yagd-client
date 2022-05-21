@@ -29,7 +29,7 @@ s.on("connection", (ws: WebSocket) => {
 // end websocket server
 
 let mainWindow: BrowserWindow | null = null;
-let childProcess: ChildProcessWithoutNullStreams;
+let childProcess: ChildProcessWithoutNullStreams | null = null;
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -59,7 +59,7 @@ app.whenReady().then(async () => {
 
 app.once("window-all-closed", () => {
     app.quit();
-    childProcess.kill("SIGHUP");
+    killChildProcess();
 });
 
 // register tasks to be executed by the background process
@@ -94,9 +94,15 @@ function registerIpcHandlers(mainWindow: BrowserWindow) {
     ipcMain.handle("spawn-child-process", () => {
         return spawnChildProcess();
     });
+
+    ipcMain.handle("kill-child-process", () => {
+        return killChildProcess();
+    });
 }
 
 const spawnChildProcess = () => {
+    if (childProcess) return;
+
     console.log("spawnChildProcess called in main.ts");
 
     const filepath = path.join("scripts", "run_child_process");
@@ -111,13 +117,17 @@ const spawnChildProcess = () => {
         });
     }
 
-    childProcess.stdout.on("data", (data) => {
+    childProcess?.stdout.on("data", (data) => {
         console.log(String(data));
     });
 
-    childProcess.stderr.on("data", (data) => {
+    childProcess?.stderr.on("data", (data) => {
         console.error(String(data));
     });
+};
 
-    return true;
+const killChildProcess = () => {
+    console.log("killChildProcess called in main.ts");
+    // childProcess.kill("SIGHUP");
+    childProcess = null;
 };
