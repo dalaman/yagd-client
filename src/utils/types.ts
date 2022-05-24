@@ -1,6 +1,6 @@
 export type NewOrJoin = "New" | "Join";
 
-export type ProtocolHeaderType = "CHAT" | "TEXT" | "CURSOR" | "INFO";
+export type ProtocolHeaderType = "CHAT" | "TEXT" | "CURSOR" | "INFO" | "EXIT";
 
 export type ProtocolHeader = {
     name: string;

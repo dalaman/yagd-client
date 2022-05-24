@@ -8,7 +8,7 @@ const osCommands: OsCommands = {
         lin: "java",
     },
     get_java_pid: {
-        win: "echo NO IMPL",
+        win: `tasklist /FI "IMAGENAME eq java" /FO LIST | findstr "PID:`,
         lin: "ps xao pid,comm | grep java | grep -o '[0-9]*'",
     },
     kill: {

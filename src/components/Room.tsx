@@ -10,6 +10,7 @@ import TextEditor from "./TextEditor";
 import Avatar from "./Avatar";
 import Chat from "./Chat";
 import { spawnChildProcess, killChildProcess } from "../utils/utils";
+import { sendWrapper } from "../utils/websocket";
 import { useNavigate } from "react-router-dom";
 
 const title = "Room";
@@ -32,6 +33,7 @@ function Room() {
     // TODO: notify exit
     const handleClickExit = () => {
         console.log("handleClickExit");
+        sendWrapper(/* type= */ "EXIT", /* content= */ "dummy");
         killChildProcess();
         navigate("/");
     };

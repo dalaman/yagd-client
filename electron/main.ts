@@ -133,6 +133,7 @@ const spawnChildProcess = () => {
         javaClientPid = allJavaPidsWithYagd.filter(
             (x) => !allJavaPids.includes(x)
         )[0];
+        console.log("javaClientPid:", javaClientPid);
     });
 
     childProcess?.stderr.on("data", (data) => {
@@ -140,22 +141,42 @@ const spawnChildProcess = () => {
     });
 };
 
+const sliceSplit = (str: string, length: number) => {
+    const splitted: Array<string> = [];
+
+    while (str.length > length) {
+        splitted.push(str.slice(0, length));
+        str = str.slice(length);
+    }
+
+    splitted.push(str);
+    return splitted;
+};
+
 const getJavaPid = () => {
-    let rtn;
     try {
-        rtn = execSync(osCommands.get_java_pid[platform]);
+        const rtn = String(execSync(osCommands.get_java_pid[platform]));
+        console.log("all java pid:", rtn);
+
+        if (platform === "win") {
+            let numbers = "";
+            for (const c of rtn) {
+                if (!isNaN(Number(c))) numbers += c;
+            }
+
+            const allJavaPids = sliceSplit(numbers, 4);
+            console.log("allJavaPids:", allJavaPids);
+            return allJavaPids;
+        } else {
+            const allJavaPids = rtn.split("\n");
+            allJavaPids.pop(); // pop last ""
+            return allJavaPids;
+        }
     } catch {
         // if no java process, shell returns 1
         console.log("no java ps found");
         return [];
     }
-
-    console.log("rtn:", String(rtn));
-
-    const allJavaPids = String(rtn).split("\n");
-    allJavaPids.pop(); // pop last ""
-
-    return allJavaPids;
 };
 
 const killChildProcess = () => {
