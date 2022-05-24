@@ -4,6 +4,7 @@ import { Backdrop, CircularProgress, Stack } from "@mui/material";
 type Props = {
     open: boolean;
     whatURwating4: string;
+    children?: React.ReactNode;
 };
 
 function CircularProgressWithText(props: Props) {
@@ -12,9 +13,10 @@ function CircularProgressWithText(props: Props) {
             sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={props.open}
         >
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={2} alignItems="center">
                 <CircularProgress color="inherit" />
                 <h2>Connecting...</h2>
+                {props.children}
             </Stack>
         </Backdrop>
     );

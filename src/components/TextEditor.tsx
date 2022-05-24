@@ -41,6 +41,9 @@ import "./TextEditor.css";
 import { WHOAMI } from "../utils/config";
 import { CursorPosition, CursorUserDict } from "../utils/types";
 import CircularProgressWithText from "./CircularProgressWithText";
+import { killChildProcess } from "../utils/utils";
+import { useNavigate } from "react-router-dom";
+
 // import ICursorPositionChangedEvent from "monaco-editor";
 
 type Props = {
@@ -48,6 +51,7 @@ type Props = {
 };
 
 function TextEditor(props: Props) {
+    const navigate = useNavigate();
     const bottomMargin = 250;
     const [innerWidth, innerHeight] = useWindowSize();
 
@@ -330,6 +334,12 @@ function TextEditor(props: Props) {
         </CardContent>
     );
 
+    const handleClickExit = () => {
+        console.log("handleClickExit");
+        killChildProcess();
+        navigate("/");
+    };
+
     return (
         <div>
             <Snackbar
@@ -350,7 +360,15 @@ function TextEditor(props: Props) {
             <CircularProgressWithText
                 open={openCircularProgress}
                 whatURwating4="Connecting..."
-            />
+            >
+                <Button
+                    onClick={handleClickExit}
+                    color="secondary"
+                    variant="contained"
+                >
+                    Exit
+                </Button>
+            </CircularProgressWithText>
 
             {dialog}
 
