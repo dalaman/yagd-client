@@ -141,37 +141,31 @@ const spawnChildProcess = () => {
     });
 };
 
-const sliceSplit = (str: string, length: number) => {
-    const splitted: Array<string> = [];
-
-    while (str.length > length) {
-        splitted.push(str.slice(0, length));
-        str = str.slice(length);
-    }
-
-    splitted.push(str);
-    return splitted;
-};
-
 const getJavaPid = () => {
     try {
         const rtn = String(execSync(osCommands.get_java_pid[platform]));
         console.log("all java pid:", rtn);
+        let allJavaPids: Array<string> = [];
 
         if (platform === "win") {
-            let numbers = "";
-            for (const c of rtn) {
-                if (!isNaN(Number(c))) numbers += c;
-            }
 
-            const allJavaPids = sliceSplit(numbers, 4);
-            console.log("allJavaPids:", allJavaPids);
-            return allJavaPids;
-        } else {
-            const allJavaPids = rtn.split("\n");
-            allJavaPids.pop(); // pop last ""
-            return allJavaPids;
+            for (const line of rtn.split("\n")){
+                let numbers = "";
+            for (const c of line){
+                if (
+                    (!isNaN(Number(c)))
+                    &&(c!==" ")
+                    &&(c!=="\r")
+                ) numbers += c;
+            }
+            allJavaPids.push(numbers);
         }
+        } else {
+            allJavaPids = rtn.split("\n");
+        }
+        allJavaPids.pop(); // pop last ""
+        console.log("allJavaPids:", allJavaPids);
+        return allJavaPids;
     } catch {
         // if no java process, shell returns 1
         console.log("no java ps found");
@@ -182,19 +176,19 @@ const getJavaPid = () => {
 const killChildProcess = () => {
     console.log("killChildProcess called in main.ts");
 
-    childProcess?.kill("SIGHUP");
-    childProcess = null;
-
     if (javaClientPid) {
         const cmd = osCommands.kill[platform] + " " + javaClientPid;
 
         try {
             execSync(cmd);
             console.log("javaClient ps killed successfully");
+
+            childProcess?.kill("SIGHUP");
         } catch {
             // if no java process, shell returns 1
             console.log("javaClient ps cannot be killed");
         }
     }
+    childProcess = null;
     javaClientPid = null;
 };
