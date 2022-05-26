@@ -13,7 +13,10 @@ export default interface API {
     selectDirectory: () => Promise<Dialog>;
     selectFile: () => Promise<Dialog>;
     pathJoin: (dir: string, filename: string) => string;
-    spawnChildProcess: () => Promise<void>;
+    spawnChildProcess: (
+        socket_url: string,
+        socket_port: string
+    ) => Promise<void>;
     killChildProcess: () => Promise<void>;
 }
 
@@ -59,8 +62,12 @@ const pathJoin = (dir: string, filename: string) => {
     return path.join(dir, filename);
 };
 
-const spawnChildProcess = async () => {
-    return (await ipcRenderer.invoke("spawn-child-process")) as Promise<void>;
+const spawnChildProcess = async (socket_url: string, socket_port: string) => {
+    return (await ipcRenderer.invoke(
+        "spawn-child-process",
+        socket_url,
+        socket_port
+    )) as Promise<void>;
 };
 
 const killChildProcess = async () => {

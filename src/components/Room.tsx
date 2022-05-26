@@ -9,7 +9,7 @@ import {
 import TextEditor from "./TextEditor";
 import Avatar from "./Avatar";
 import Chat from "./Chat";
-import { spawnChildProcess, killChildProcess } from "../utils/utils";
+import { killChildProcess } from "../utils/utils";
 import { sendWrapper } from "../utils/websocket";
 import { useNavigate } from "react-router-dom";
 
@@ -53,10 +53,6 @@ function Room() {
 
             setOpenChat(!openChat);
         };
-
-    React.useEffect(() => {
-        spawnChildProcess();
-    }, []);
 
     return (
         <div>
