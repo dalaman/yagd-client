@@ -7,7 +7,7 @@
 2. Only for win
     1. Compile client .java file
 
-    2. Make _bin_ dir at yagd-client (yagd-client/bin)
+    2. Make _bin_ dir at _yagd-client_ (yagd-client/bin)
 
     3. Copy those .class into _bin_ dir
 
