@@ -53,3 +53,7 @@ export const killChildProcess = async () => {
     console.log("killChildProcess called in uitls.ts");
     return await _window.electron.killChildProcess();
 };
+
+export const getWebsocketPort = () => {
+    return _window.electron.websocketPort;
+};

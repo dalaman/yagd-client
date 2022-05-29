@@ -6,9 +6,43 @@ import * as WebSocket from "ws";
 import { spawn, execSync, ChildProcessWithoutNullStreams } from "child_process";
 import osCommands from "./os_commands";
 
-const WEBSOCKET_PORT = 8080;
 const JAVA_CLIENT_NAME = "BackendProcess";
 const platform = process.platform === "win32" ? "win" : "lin";
+
+const logging = (ctx: string) => {
+    console.log("[main.ts] " + ctx, "\n");
+};
+
+const getJavaPid = () => {
+    try {
+        let allJavaPids: Array<string> = [];
+        const rtn = String(execSync(osCommands.get_java_pid[platform]));
+
+        if (platform === "win") {
+            for (const line of rtn.split("\n")) {
+                let numbers = "";
+                for (const c of line) {
+                    if (!isNaN(Number(c)) && c !== " " && c !== "\r")
+                        numbers += c;
+                }
+                allJavaPids.push(numbers);
+            }
+        } else {
+            allJavaPids = rtn.split("\n");
+        }
+        allJavaPids.pop(); // pop last ""
+        logging("allJavaPids: " + allJavaPids);
+        return allJavaPids;
+    } catch {
+        // if no java process, shell returns 1
+        logging("no java ps found");
+        return [];
+    }
+};
+
+const BASE_WEBSOCKET_PORT = 8080;
+const WEBSOCKET_PORT = BASE_WEBSOCKET_PORT + getJavaPid().length + 1;
+console.log("WEBSOCKET_PORT:", WEBSOCKET_PORT);
 
 // websocket server ( <===> [ReactComp & BackendProcess.java] as client)
 const server = WebSocket.Server;
@@ -104,6 +138,10 @@ function registerIpcHandlers(mainWindow: BrowserWindow) {
     ipcMain.handle("kill-child-process", () => {
         return killChildProcess();
     });
+
+    ipcMain.on("websocket-port", (event, _) => {
+        event.returnValue = WEBSOCKET_PORT;
+    });
 }
 
 const spawnChildProcess = (socket_url: string, socket_port: string) => {
@@ -127,7 +165,7 @@ const spawnChildProcess = (socket_url: string, socket_port: string) => {
 
     childProcess = spawn(
         /* command= */ osCommands.run_child_process[platform],
-        /* args= */ [
+        /* args= */[
             ...options,
             String(WEBSOCKET_PORT),
             socket_url,
@@ -138,7 +176,7 @@ const spawnChildProcess = (socket_url: string, socket_port: string) => {
         }
     );
 
-    childProcess?.stdout.on("data", (data) => {
+    childProcess ?.stdout.on("data", (data) => {
         console.log(String(data));
         const allJavaPidsWithYagd = getJavaPid(); // get (non-yagd + yagd) java proess
 
@@ -148,36 +186,9 @@ const spawnChildProcess = (socket_url: string, socket_port: string) => {
         logging("javaClientPid: " + javaClientPid);
     });
 
-    childProcess?.stderr.on("data", (data) => {
+    childProcess ?.stderr.on("data", (data) => {
         console.error(String(data));
     });
-};
-
-const getJavaPid = () => {
-    try {
-        const rtn = String(execSync(osCommands.get_java_pid[platform]));
-        let allJavaPids: Array<string> = [];
-
-        if (platform === "win") {
-            for (const line of rtn.split("\n")) {
-                let numbers = "";
-                for (const c of line) {
-                    if (!isNaN(Number(c)) && c !== " " && c !== "\r")
-                        numbers += c;
-                }
-                allJavaPids.push(numbers);
-            }
-        } else {
-            allJavaPids = rtn.split("\n");
-        }
-        allJavaPids.pop(); // pop last ""
-        logging("allJavaPids: " + allJavaPids);
-        return allJavaPids;
-    } catch {
-        // if no java process, shell returns 1
-        logging("no java ps found");
-        return [];
-    }
 };
 
 const killChildProcess = () => {
@@ -190,7 +201,7 @@ const killChildProcess = () => {
             execSync(cmd);
             logging("javaClient ps killed successfully");
 
-            childProcess?.kill("SIGHUP");
+            childProcess ?.kill("SIGHUP");
         } catch {
             // if no java process, shell returns 1
             logging("javaClient ps cannot be killed");
@@ -198,8 +209,4 @@ const killChildProcess = () => {
     }
     childProcess = null;
     javaClientPid = null;
-};
-
-const logging = (ctx: string) => {
-    console.log("[main.ts] " + ctx, "\n");
 };

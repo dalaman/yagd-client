@@ -18,6 +18,7 @@ export default interface API {
         socket_port: string
     ) => Promise<void>;
     killChildProcess: () => Promise<void>;
+    websocketPort: number;
 }
 
 async function readFile(filePath: string): Promise<Buffer>;
@@ -74,6 +75,8 @@ const killChildProcess = async () => {
     return (await ipcRenderer.invoke("kill-child-process")) as Promise<void>;
 };
 
+const websocketPort:number =ipcRenderer.sendSync("websocket-port");
+
 const api: API = {
     readFile,
     writeFile,
@@ -82,6 +85,7 @@ const api: API = {
     pathJoin,
     spawnChildProcess,
     killChildProcess,
+    websocketPort,
 };
 
 contextBridge.exposeInMainWorld("electron", api);
