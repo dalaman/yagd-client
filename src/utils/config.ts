@@ -4,7 +4,7 @@ const PORT = getWebsocketPort();
 
 export const editorTheme = "vs-dark";
 
-export const defaultText = `// type somthing below\n\n`;
+export const defaultText = `// type something below\n\n`;
 
 export const availableLanguageList = ["txt", "javascript", "typescript"];
 
