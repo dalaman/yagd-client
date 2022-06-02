@@ -26,3 +26,6 @@ yarn-error.log*
 dist
 
 memo.md
+
+# java class
+bin
